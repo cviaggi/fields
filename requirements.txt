@@ -1,0 +1,9 @@
+# Runtime dependencies
+# Add your project dependencies here
+
+# Development dependencies (optional)
+# pytest>=7.0
+# black
+# isort
+# flake8
+# mypy

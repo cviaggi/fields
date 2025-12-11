@@ -26,7 +26,9 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-dependencies = []
+dependencies = [
+    "click>=8.0.0"
+]
 
 [project.optional-dependencies]
 dev = [
@@ -42,13 +44,16 @@ docs = [
     "sphinx-rtd-theme",
 ]
 
+[project.scripts]
+fields = "src.main:main"
+
 [project.urls]
 Homepage = "https://github.com/yourusername/fields"
 Repository = "https://github.com/yourusername/fields"
 Issues = "https://github.com/yourusername/fields/issues"
 
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 
 [tool.black]
 line-length = 88

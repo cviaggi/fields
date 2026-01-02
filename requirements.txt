@@ -1,5 +1,6 @@
 # Runtime dependencies
 click>=8.0.0
+pypdf>=6.0.0
 # Add your project dependencies here
 
 # Development dependencies (optional)

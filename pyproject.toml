@@ -27,7 +27,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "click>=8.0.0"
+    "click>=8.0.0",
+    "pypdf>=6.0.0"
 ]
 
 [project.optional-dependencies]

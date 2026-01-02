@@ -36,17 +36,6 @@ def hello(ctx):
 
 
 @cli.command()
-@click.pass_context
-@click.option("--name", required=True, help="Name of the field")
-@click.option("--value", required=True, help="Value of the field")
-def create_field(ctx, name, value):
-    """Create a new field."""
-    logger = get_logger()
-    logger.debug(f"Creating field with name='{name}' and value='{value}'")
-    logger.info(f"Created field: {name} = {value}")
-
-
-@cli.command()
 @click.argument('filename', type=click.Path(exists=True))
 @click.option('--lines', '-n', type=int, help='Number of lines to read (default: all)')
 @click.option('--encoding', default='utf-8', help='File encoding (default: utf-8)')

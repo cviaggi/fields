@@ -3,7 +3,7 @@
 import sys
 import os
 import click
-from utils import get_logger, set_global_debug, get_file_reader, SummarizePermit
+from utils import get_logger, set_global_debug, get_file_reader, SummarizePermit, Spreadsheet
 
 # Add the src directory to Python path so imports work from any location
 sys.path.insert(0, os.path.dirname(__file__))
@@ -178,6 +178,18 @@ def summarize_directory(ctx, directory):
         else:
             click.echo("\n📄 No files found in this directory.")
 
+        if summaries:
+            spreadsheet_summary = Spreadsheet()
+
+            click.echo(f"\n📄 Summaries found ({len(summaries)}):")
+            click.echo("-" * 50)
+            for i, summary in enumerate(summaries, 1):
+                click.echo(f"{i:3d}. {summary['field_names']}")
+                for field_name in summary['field_names']:
+                    if not spreadsheet_summary.sheet_exists(field_name):
+                        spreadsheet_summary.create_sheet(field_name)
+
+        click.echo("-" * 50)
         logger.info(f"Successfully processed directory: {directory} (found {len(files)} files)")
 
     except Exception as e:

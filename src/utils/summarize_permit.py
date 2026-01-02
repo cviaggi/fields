@@ -151,7 +151,6 @@ class SummarizePermit:
         for line in lines:
             
             line = line.strip()
-            self.logger.debug(f"Processing line: {line}")
 
             if not line:
                 continue

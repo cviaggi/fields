@@ -41,7 +41,7 @@ def hello(ctx):
 @click.option('--encoding', default='utf-8', help='File encoding (default: utf-8)')
 @click.pass_context
 def read_file(ctx, filename, lines, encoding):
-    """Read and display the contents of a file."""
+    """Test Read and display the contents of a file."""
     logger = get_logger()
     logger.debug(f"Reading file: {filename}")
 
@@ -130,6 +130,58 @@ def summarize_file(ctx, filename, max_length):
 
     except Exception as e:
         logger.error(f"Error summarizing file {filename}: {e}")
+        ctx.exit(1)
+
+
+@cli.command()
+@click.argument('directory', type=click.Path(exists=True, file_okay=False, dir_okay=True))
+@click.pass_context
+def summarize_directory(ctx, directory):
+    """Summarize permit files in a directory."""
+    logger = get_logger()
+
+    try:
+        click.echo(f"📁 Directory: {directory}")
+
+        # List all files in the directory
+        files = []
+        summaries = []
+        try:
+            for item in os.listdir(directory):
+                item_path = os.path.join(directory, item)
+                if os.path.isfile(item_path):
+                    files.append(item_path)
+        except PermissionError:
+            logger.warning(f"Permission denied accessing directory: {directory}")
+
+        if files:
+            click.echo(f"\n📄 Files found ({len(files)}):")
+            click.echo("-" * 50)
+            for i, file in enumerate(sorted(files), 1):
+                click.echo(f"{i:3d}. {file}")
+        else:
+            click.echo("\n📄 No files found in this directory.")
+
+        if files:
+            click.echo(f"\n📄 Processing found ({len(files)}):")
+            click.echo("-" * 50)
+            for i, file in enumerate(sorted(files), 1):
+                click.echo(f"Processing :: {i:3d}. {file}")
+                summarizer = SummarizePermit()
+                result = summarizer.summarize_from_file(file, max_length=500)
+
+                if not result.get("success", False):
+                    logger.error(f"Failed to summarize file: {result.get('error', 'Unknown error')}")
+                    ctx.exit(1)
+
+                summaries.append(result)    
+        else:
+            click.echo("\n📄 No files found in this directory.")
+
+        logger.info(f"Successfully processed directory: {directory} (found {len(files)} files)")
+
+    except Exception as e:
+        logger.error(f"Error processing directory {directory}: {e}")
         ctx.exit(1)
 
 

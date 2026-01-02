@@ -39,10 +39,10 @@ class SummarizePermit:
 
             # Get file information
             file_info = self.file_reader.get_file_info(file_path)
-
+            
             # Extract patterns and basic summary
             extracted_data = self._extract_basic_summary(content, max_length)
-
+            
             # Create a basic text summary for backward compatibility
             if len(content) <= 500:
                 summary = content
@@ -138,7 +138,8 @@ class SummarizePermit:
         date_time_pattern = r'^[A-Za-z]{3}, [A-Za-z]{3} \d{1,2}, \d{4} \d{1,2}:\d{2} (?:AM|PM)(?: [A-Za-z]{3}, [A-Za-z]{3} \d{1,2}, \d{4} \d{1,2}:\d{2} (?:AM|PM))*\s'
 
         # Field name pattern: Word+ Field (Description in parentheses)
-        field_name_pattern = r'^[A-Za-z\s]+ Field \([A-Za-z\s]+\)'
+        field_name_pattern = r'^[A-Za-z\s]+ \(Athletic Field Use\)'
+
 
         # Split text into lines and filter for patterns
         lines = text.split('\n')
@@ -148,7 +149,10 @@ class SummarizePermit:
         field_names = []
 
         for line in lines:
+            
             line = line.strip()
+            self.logger.debug(f"Processing line: {line}")
+
             if not line:
                 continue
 

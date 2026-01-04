@@ -3,7 +3,7 @@
 import sys
 import os
 import click
-from utils import get_logger, set_global_debug, get_file_reader, SummarizePermit, Spreadsheet
+from utils import get_logger, set_global_debug, get_file_reader, parse_spreadsheet_row, SummarizePermit, Spreadsheet
 
 # Add the src directory to Python path so imports work from any location
 sys.path.insert(0, os.path.dirname(__file__))
@@ -184,10 +184,26 @@ def summarize_directory(ctx, directory):
             click.echo(f"\n📄 Summaries found ({len(summaries)}):")
             click.echo("-" * 50)
             for i, summary in enumerate(summaries, 1):
-                click.echo(f"{i:3d}. {summary['field_names']}")
+                
                 for field_name in summary['field_names']:
-                    if not spreadsheet_summary.sheet_exists(field_name):
-                        spreadsheet_summary.create_sheet(field_name)
+                    truncated_field_name = field_name[0:field_name.find("(Athletic Field Use)")].strip()
+                    click.echo(f"{i:3d}. {truncated_field_name}")
+                    if not spreadsheet_summary.sheet_exists(truncated_field_name):
+                        spreadsheet_summary.create_sheet(truncated_field_name)
+                    
+                    for row in summary['field_date_time_slots'][field_name]:
+                        spreadsheet_summary.switch_sheet(truncated_field_name)
+
+                        if row.find("--") < 1:
+                            row_data = {"data": str(row)}
+                            parse_spreadsheet_row(row)
+                            spreadsheet_summary.add_row(row_data)
+
+            # Remove the initial worksheet
+            del spreadsheet_summary.worksheets["Sheet1"]
+
+            click.echo(f"{len(spreadsheet_summary.worksheets)} worksheets created")
+            spreadsheet_summary.save_to_excel("/tmp/spreadsheet_summary.xlsx")
 
         click.echo("-" * 50)
         logger.info(f"Successfully processed directory: {directory} (found {len(files)} files)")

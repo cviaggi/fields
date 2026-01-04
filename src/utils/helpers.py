@@ -2,7 +2,9 @@
 
 import os
 import sys
-from typing import Any, Optional
+from typing import Any, Optional, Dict
+
+from utils import logger
 
 
 def ensure_directory_exists(path: str) -> None:
@@ -49,3 +51,17 @@ def print_debug_info(*args: Any, **kwargs: Any) -> None:
     """
     if safe_get_env_var("DEBUG"):
         print("[DEBUG]", *args, **kwargs)
+
+def parse_spreadsheet_row(row_data) -> Dict[str, Any]:
+    """Take the spreadhseet line and parse it into columns
+
+    Args:
+        row_data: string from the pdf file
+
+    Returns:
+        dictionary of the values to add
+    """
+
+    elements = row_data.split(",")
+    logger.get_logger().debug(elements)
+    

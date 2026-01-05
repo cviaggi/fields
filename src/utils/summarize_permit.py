@@ -21,7 +21,7 @@ class SummarizePermit:
         self.file_reader = get_file_reader(str(self.base_path))
 
     def summarize_from_file(self, file_path: Union[str, Path],
-                          max_length: int = 500) -> Dict[str, Any]:
+                            max_length: int = 500) -> Dict[str, Any]:
         """Summarize permit information from a file.
 
         Args:
@@ -49,6 +49,8 @@ class SummarizePermit:
             else:
                 summary = content[:500] + "..."
 
+            issued_date = self._extract_issued_date(summary)
+
             result = {
                 "file_path": str(file_info["path"]),
                 "file_type": "pdf" if file_info.get("is_pdf", False) else "text",
@@ -56,6 +58,7 @@ class SummarizePermit:
                 "date_time_slots": extracted_data['date_time_slots'],
                 "field_names": extracted_data['field_names'],
                 "field_date_time_slots": extracted_data['field_date_time_slots'],
+                "issued_date": issued_date,
                 "word_count": len(content.split()),
                 "character_count": len(content),
                 "pages": file_info.get("pdf_pages") if file_info.get("is_pdf") else 1,
@@ -119,6 +122,23 @@ class SummarizePermit:
                 "success": False
             }
 
+    def _extract_issued_date(self, text: str) -> str:
+        """Troll the summary and then extract the issued date
+
+        Args:
+            text: the header summary
+        
+        Returns:
+            Issued Permit date and time
+        """
+
+        summary_parts = text.split("\n")
+        for part in summary_parts:
+            if part.startswith("Date of Issue"):
+                return part[14:]
+
+        return "Issue Date Not Found"
+
     def _extract_basic_summary(self, text: str, max_length: int) -> Dict[str, List[str]]:
         """Extract lines containing date/time patterns and field names from text content.
 
@@ -165,12 +185,12 @@ class SummarizePermit:
                 field_names.append(line)
                 field_date_time_slots[line] = []
                 current_field_name = line
-
+            
         self.logger.debug(f"Found {len(date_time_slots)} date/time slots and {len(field_names)} field names")
         return {
             'date_time_slots': date_time_slots,
             'field_names': field_names,
-            'field_date_time_slots': field_date_time_slots
+            'field_date_time_slots': field_date_time_slots,
         }
 
     def batch_summarize(self, file_paths: List[Union[str, Path]],

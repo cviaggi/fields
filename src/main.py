@@ -185,6 +185,8 @@ def summarize_directory(ctx, directory):
             click.echo("-" * 50)
             for i, summary in enumerate(summaries, 1):
                 
+                issued_date = summary['issued_date']
+
                 for field_name in summary['field_names']:
                     truncated_field_name = field_name[0:field_name.find("(Athletic Field Use)")].strip()
                     click.echo(f"{i:3d}. {truncated_field_name}")
@@ -195,9 +197,7 @@ def summarize_directory(ctx, directory):
                         spreadsheet_summary.switch_sheet(truncated_field_name)
 
                         if row.find("--") < 1:
-                            row_data = {"data": str(row)}
-                            parse_spreadsheet_row(row)
-                            spreadsheet_summary.add_row(row_data)
+                            spreadsheet_summary.add_row(parse_spreadsheet_row(row, issued_date))
 
             # Remove the initial worksheet
             del spreadsheet_summary.worksheets["Sheet1"]
